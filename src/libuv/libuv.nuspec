@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>Microsoft.AspNet.Internal.libuv-$TargetOS$</id>
+        <version>0.0.1-pre</version>
+        <authors>Microsoft</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>libuv build package - $TargetOS$</description>
+    </metadata>
+</package>

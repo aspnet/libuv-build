@@ -1,7 +1,55 @@
-
-var VERSION='0.1'
-var FULL_VERSION='0.1'
+var PRODUCT_VERSION = '1.0.0'
 var AUTHORS='Microsoft Open Technologies, Inc.'
 
 use-standard-lifecycle
 k-standard-goals
+
+var Configuration2 = '${E("Configuration")}'
+var ROOT = '${Directory.GetCurrentDirectory()}'
+var BUILD_DIR2 = '${Path.Combine(ROOT, "artifacts", "build")}'
+var PROGRAM_FILES_X86 = '${Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}'
+var MSBUILD = '${Path.Combine(PROGRAM_FILES_X86, "MSBuild", "14.0", "Bin", "MSBuild.exe")}'
+
+var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
+
+#repo-initialize target='initialize'
+    git gitCommand="submodule update --init"
+
+#native-compile
+
+#build-compile target='compile'
+
+#build-windows .ensure-msbuild target='build-compile' if='CanBuildForWindows'
+    @{
+      Exec(MSBUILD, Path.Combine(ROOT, "src\\libuv\\libuv.vcxproj") + " /p:Platform=Win32 /p:Configuration=" + Configuration2);
+      Exec(MSBUILD, Path.Combine(ROOT, "src\\libuv\\libuv.vcxproj") + " /p:Platform=x64 /p:Configuration=" + Configuration2);
+      Exec(MSBUILD, Path.Combine(ROOT, "src\\libuv\\libuv.vcxproj") + " /p:Platform=ARM /p:Configuration=" + Configuration2);
+    }
+
+#nuget-pack target='package' if='CanBuildForWindows'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x86\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win10-arm\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='libuv.nuspec' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='thirdpartynotices.txt' overwrite='${true}'
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Windows' nugetPath='.nuget/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\libuv.nuspec")}'
+
+#ensure-msbuild
+    @{
+        if (!File.Exists(MSBUILD))
+        {
+            Log.Warn("msbuild version 14 not found. Please ensure you have the VS 2015 C++ SDK installed.");
+            Environment.Exit(1);
+        }
+    }
+
+functions @{
+    bool CanBuildForWindows
+    {
+        get 
+        {
+            var p = (int)Environment.OSVersion.Platform;
+            return (p != 4) && (p != 6) && (p != 128);
+        }
+    }
+}
