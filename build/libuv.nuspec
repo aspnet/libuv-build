@@ -7,4 +7,7 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>libuv build package - $TargetOS$</description>
     </metadata>
+    <files>
+        <file src="**" />
+    </files>
 </package>

@@ -9,6 +9,7 @@ var ROOT = '${Directory.GetCurrentDirectory()}'
 var BUILD_DIR2 = '${Path.Combine(ROOT, "artifacts", "build")}'
 var PROGRAM_FILES_X86 = '${Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}'
 var MSBUILD = '${Path.Combine(PROGRAM_FILES_X86, "MSBuild", "14.0", "Bin", "MSBuild.exe")}'
+var CLANG = '${SearchForClang()}'
 
 var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
 
@@ -26,14 +27,6 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
       Exec(MSBUILD, Path.Combine(ROOT, "src\\libuv\\libuv.vcxproj") + " /p:Platform=ARM /p:Configuration=" + Configuration2);
     }
 
-#nuget-pack target='package' if='CanBuildForWindows'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x86\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win10-arm\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='libuv.nuspec' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='thirdpartynotices.txt' overwrite='${true}'
-    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Windows' nugetPath='.nuget/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\libuv.nuspec")}'
-
 #ensure-msbuild
     @{
         if (!File.Exists(MSBUILD))
@@ -43,13 +36,151 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
         }
     }
 
+#nuget-pack target='package' if='CanBuildForWindows'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x86\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win10-arm\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='*' overwrite='${true}'
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Windows' nugetPath='.nuget/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\libuv.nuspec")}'
+
+#build-darwin .ensure-clang target='build-compile' if='CanBuildForDarwin'
+    @{
+        var libuvRoot = Path.Combine(ROOT, "submodules/libuv");
+        var sourceFiles = new string[]
+        {
+            Path.Combine(libuvRoot, "src/fs-poll.c"),
+            Path.Combine(libuvRoot, "src/inet.c"),
+            Path.Combine(libuvRoot, "src/threadpool.c"),
+            Path.Combine(libuvRoot, "src/uv-common.c"),
+            Path.Combine(libuvRoot, "src/version.c"),
+            Path.Combine(libuvRoot, "src/unix/async.c"),
+            Path.Combine(libuvRoot, "src/unix/core.c"),
+            Path.Combine(libuvRoot, "src/unix/dl.c"),
+            Path.Combine(libuvRoot, "src/unix/fs.c"),
+            Path.Combine(libuvRoot, "src/unix/getaddrinfo.c"),
+            Path.Combine(libuvRoot, "src/unix/getnameinfo.c"),
+            Path.Combine(libuvRoot, "src/unix/loop.c"),
+            Path.Combine(libuvRoot, "src/unix/loop-watcher.c"),
+            Path.Combine(libuvRoot, "src/unix/pipe.c"),
+            Path.Combine(libuvRoot, "src/unix/poll.c"),
+            Path.Combine(libuvRoot, "src/unix/process.c"),
+            Path.Combine(libuvRoot, "src/unix/signal.c"),
+            Path.Combine(libuvRoot, "src/unix/stream.c"),
+            Path.Combine(libuvRoot, "src/unix/tcp.c"),
+            Path.Combine(libuvRoot, "src/unix/thread.c"),
+            Path.Combine(libuvRoot, "src/unix/timer.c"),
+            Path.Combine(libuvRoot, "src/unix/tty.c"),
+            Path.Combine(libuvRoot, "src/unix/udp.c"),
+            Path.Combine(libuvRoot, "src/unix/proctitle.c"),
+            Path.Combine(libuvRoot, "src/unix/darwin.c"),
+            Path.Combine(libuvRoot, "src/unix/fsevents.c"),
+            Path.Combine(libuvRoot, "src/unix/darwin-proctitle.c"),
+            Path.Combine(libuvRoot, "src/unix/kqueue.c")
+        };
+
+        var outputDir = Path.Combine(ROOT, "src/libuv/bin/darwin");
+        var outputPath = Path.Combine(outputDir, "libuv.dylib");
+        Directory.CreateDirectory(outputDir);
+
+        var sources = string.Join(" ", sourceFiles);
+
+        Exec(CLANG,
+            string.Format("{0} -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_DARWIN_USE_64_BIT_INODE=1 -D_DARWIN_UNLIMITED_SELECT=1",
+            sources, outputPath, libuvRoot));
+    }
+
+#nuget-pack target='package' if='CanBuildForDarwin'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/darwin")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin/runtimes/osx/native")}' include='*.dylib' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin")}' include='*' overwrite='${true}'
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Darwin' nugetPath='.nuget/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/libuv.nuspec")}'
+
+
+#ensure-clang
+    @{
+        if (CLANG == null || !File.Exists(CLANG))
+        {
+            Log.Warn("clang not found. Please ensure you have clang on the path or set CXX to a path to clang.");
+            Environment.Exit(1);
+        }
+    }
+
 functions @{
     bool CanBuildForWindows
     {
-        get 
+        get
         {
             var p = (int)Environment.OSVersion.Platform;
             return (p != 4) && (p != 6) && (p != 128);
         }
+    }
+
+    bool CanBuildForDarwin
+    {
+        get
+        {
+            return string.Equals(Uname(), "Darwin");
+        }
+    }
+
+    public string SearchForClang()
+    {
+        if (!CanBuildForDarwin)
+        {
+            return null;
+        }
+
+        var CXX = Environment.GetEnvironmentVariable("CXX");
+
+        if (!string.IsNullOrEmpty(CXX))
+        {
+            return CXX;
+        }
+
+        foreach(var dir in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator))
+        {
+            if (File.Exists(Path.Combine(dir, "clang")))
+            {
+                return Path.Combine(dir, "clang");
+            }
+            else if (File.Exists(Path.Combine(dir, "clang")))
+            {
+                return Path.Combine(dir, "clang");
+            }
+        }
+
+        return null;
+    }
+
+    public string Uname()
+    {
+        try
+        {
+            string uname;
+            ExecuteAndRedirectOutput("uname", "", out uname);
+            return string.IsNullOrEmpty(uname) ? null : uname.Trim();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    int ExecuteAndRedirectOutput(string command, string argument, out string content)
+    {
+        var procStartInfo = new ProcessStartInfo
+        {
+            FileName = command,
+            Arguments = argument,
+            WorkingDirectory = Directory.GetCurrentDirectory(),
+            UseShellExecute = false
+        };
+        procStartInfo.EnvironmentVariables["DNX_TRACE"] = "0";
+        procStartInfo.RedirectStandardOutput = true;
+
+        var process = Process.Start(procStartInfo);
+        content = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+
+        return process.ExitCode;
     }
 }
