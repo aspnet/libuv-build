@@ -27,6 +27,11 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
       Exec(MSBUILD, Path.Combine(ROOT, "src\\libuv\\libuv.vcxproj") + " /p:Platform=ARM /p:Configuration=" + Configuration2);
     }
 
+#copy-symbols target='build-compile' if='CanBuildForWindows'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "symbols\\Win32", Configuration2)}' include='*.pdb' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "symbols\\x64", Configuration2)}' include='*.pdb' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "symbols\\ARM", Configuration2)}' include='*.pdb' overwrite='${true}'
+
 #ensure-msbuild
     @{
         if (!File.Exists(MSBUILD))
