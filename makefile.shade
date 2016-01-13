@@ -11,7 +11,7 @@ var PROGRAM_FILES_X86 = '${Environment.GetFolderPath(Environment.SpecialFolder.P
 var MSBUILD = '${Path.Combine(PROGRAM_FILES_X86, "MSBuild", "14.0", "Bin", "MSBuild.exe")}'
 var CLANG = '${SearchForClang()}'
 
-var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
+var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 
 #repo-initialize target='initialize'
     git gitCommand="submodule update --init"
@@ -46,7 +46,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DNX_BUILD_VERSION")}'
     copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-arm\\native")}' include='*.dll' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='*' overwrite='${true}'
-    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Windows' nugetPath='.nuget/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\libuv.nuspec")}'
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Windows' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\libuv.nuspec")}'
 
 #build-darwin .ensure-clang target='build-compile' if='CanBuildForDarwin'
     @{
@@ -179,7 +179,6 @@ functions @{
             WorkingDirectory = Directory.GetCurrentDirectory(),
             UseShellExecute = false
         };
-        procStartInfo.EnvironmentVariables["DNX_TRACE"] = "0";
         procStartInfo.RedirectStandardOutput = true;
 
         var process = Process.Start(procStartInfo);
