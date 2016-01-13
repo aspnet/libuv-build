@@ -97,7 +97,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 #nuget-pack target='package' if='CanBuildForDarwin'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/darwin")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin/runtimes/osx/native")}' include='*.dylib' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin")}' include='*' overwrite='${true}'
-    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Darwin' nugetPath='.nuget/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/libuv.nuspec")}'
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Darwin' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/libuv.nuspec")}'
 
 
 #ensure-clang
