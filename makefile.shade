@@ -53,37 +53,12 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 #build-darwin .ensure-clang target='build-compile' if='CanBuildForDarwin'
     @{
         var libuvRoot = Path.Combine(ROOT, "submodules/libuv");
-        var sourceFiles = new string[]
-        {
-            Path.Combine(libuvRoot, "src/fs-poll.c"),
-            Path.Combine(libuvRoot, "src/inet.c"),
-            Path.Combine(libuvRoot, "src/threadpool.c"),
-            Path.Combine(libuvRoot, "src/uv-common.c"),
-            Path.Combine(libuvRoot, "src/version.c"),
-            Path.Combine(libuvRoot, "src/unix/async.c"),
-            Path.Combine(libuvRoot, "src/unix/core.c"),
-            Path.Combine(libuvRoot, "src/unix/dl.c"),
-            Path.Combine(libuvRoot, "src/unix/fs.c"),
-            Path.Combine(libuvRoot, "src/unix/getaddrinfo.c"),
-            Path.Combine(libuvRoot, "src/unix/getnameinfo.c"),
-            Path.Combine(libuvRoot, "src/unix/loop.c"),
-            Path.Combine(libuvRoot, "src/unix/loop-watcher.c"),
-            Path.Combine(libuvRoot, "src/unix/pipe.c"),
-            Path.Combine(libuvRoot, "src/unix/poll.c"),
-            Path.Combine(libuvRoot, "src/unix/process.c"),
-            Path.Combine(libuvRoot, "src/unix/signal.c"),
-            Path.Combine(libuvRoot, "src/unix/stream.c"),
-            Path.Combine(libuvRoot, "src/unix/tcp.c"),
-            Path.Combine(libuvRoot, "src/unix/thread.c"),
-            Path.Combine(libuvRoot, "src/unix/timer.c"),
-            Path.Combine(libuvRoot, "src/unix/tty.c"),
-            Path.Combine(libuvRoot, "src/unix/udp.c"),
-            Path.Combine(libuvRoot, "src/unix/proctitle.c"),
-            Path.Combine(libuvRoot, "src/unix/darwin.c"),
-            Path.Combine(libuvRoot, "src/unix/fsevents.c"),
-            Path.Combine(libuvRoot, "src/unix/darwin-proctitle.c"),
-            Path.Combine(libuvRoot, "src/unix/kqueue.c")
-        };
+
+        var sourceFiles = GetCommonSourceFiles(libuvRoot);
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/darwin.c"));
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/darwin-proctitle.c"));
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/kqueue.c"));
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/fsevents.c"));
 
         var outputDir = Path.Combine(ROOT, "src/libuv/bin/darwin");
         var outputPath = Path.Combine(outputDir, "libuv.dylib");
@@ -94,6 +69,26 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         Exec(CLANG,
             string.Format("{0} -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_DARWIN_USE_64_BIT_INODE=1 -D_DARWIN_UNLIMITED_SELECT=1 -arch i386 -arch x86_64",
             sources, outputPath, libuvRoot));
+    }
+
+#build-linux .ensure-clang target='build-compile' if='CanBuildForLinux'
+    @{
+        var libuvRoot = Path.Combine(ROOT, "submodules/libuv");
+
+        var sourceFiles = GetCommonSourceFiles(libuvRoot);
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-core.c"));
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-inotify.c"));
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-syscalls.c"));
+        // sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-syscalls.h"));
+
+        var outputDir = Path.Combine(ROOT, "src/libuv/bin/linux");
+        var outputPath = Path.Combine(outputDir, "libuv.so");
+        Directory.CreateDirectory(outputDir);
+
+        var sources = string.Join(" ", sourceFiles);
+
+        Exec(CLANG,
+            string.Format("{0} -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_GNU_SOURCE", sources, outputPath, libuvRoot));
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'
@@ -130,13 +125,16 @@ functions @{
         }
     }
 
+    bool CanBuildForLinux
+    {
+        get
+        {
+            return string.Equals(Uname(), "Linux");
+        } 
+    }
+
     public string SearchForClang()
     {
-        if (!CanBuildForDarwin)
-        {
-            return null;
-        }
-
         var CXX = Environment.GetEnvironmentVariable("CXX");
 
         if (!string.IsNullOrEmpty(CXX))
@@ -189,5 +187,36 @@ functions @{
         process.WaitForExit();
 
         return process.ExitCode;
+    }
+
+    public List<string> GetCommonSourceFiles(string libuvRoot)
+    {
+       return new List<string> 
+        {
+            Path.Combine(libuvRoot, "src/fs-poll.c"),
+            Path.Combine(libuvRoot, "src/inet.c"),
+            Path.Combine(libuvRoot, "src/threadpool.c"),
+            Path.Combine(libuvRoot, "src/uv-common.c"),
+            Path.Combine(libuvRoot, "src/version.c"),
+            Path.Combine(libuvRoot, "src/unix/async.c"),
+            Path.Combine(libuvRoot, "src/unix/core.c"),
+            Path.Combine(libuvRoot, "src/unix/dl.c"),
+            Path.Combine(libuvRoot, "src/unix/fs.c"),
+            Path.Combine(libuvRoot, "src/unix/getaddrinfo.c"),
+            Path.Combine(libuvRoot, "src/unix/getnameinfo.c"),
+            Path.Combine(libuvRoot, "src/unix/loop.c"),
+            Path.Combine(libuvRoot, "src/unix/loop-watcher.c"),
+            Path.Combine(libuvRoot, "src/unix/pipe.c"),
+            Path.Combine(libuvRoot, "src/unix/poll.c"),
+            Path.Combine(libuvRoot, "src/unix/process.c"),
+            Path.Combine(libuvRoot, "src/unix/signal.c"),
+            Path.Combine(libuvRoot, "src/unix/stream.c"),
+            Path.Combine(libuvRoot, "src/unix/tcp.c"),
+            Path.Combine(libuvRoot, "src/unix/thread.c"),
+            Path.Combine(libuvRoot, "src/unix/timer.c"),
+            Path.Combine(libuvRoot, "src/unix/tty.c"),
+            Path.Combine(libuvRoot, "src/unix/udp.c"),
+            Path.Combine(libuvRoot, "src/unix/proctitle.c"),
+       };
     }
 }
