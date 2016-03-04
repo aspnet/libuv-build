@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>Microsoft.AspNetCore.Internal.libuv-Linux</id>
+        <version>0.0.1-pre</version>
+        <authors>Microsoft</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>libuv build package - Linux</description>
+    </metadata>
+    <files>
+        <file src="contents/**" />
+    </files>
+</package>
