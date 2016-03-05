@@ -42,11 +42,13 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
     }
 
 #nuget-pack target='package' if='CanBuildForWindows'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x86\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\runtimes\\win7-arm\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='*' overwrite='${true}'
-    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Windows' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\libuv.nuspec")}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-x86\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-arm\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents")}' include='*' exclude='*.nuspec' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='Microsoft.AspNetCore.Internal.libuv-Windows.nuspec' overwrite='${true}'
+ 
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\Microsoft.AspNetCore.Internal.libuv-Windows.nuspec")}'
 
 #build-darwin .ensure-clang target='build-compile' if='CanBuildForDarwin'
     @{
@@ -95,9 +97,10 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'
-    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/darwin")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin/runtimes/osx/native")}' include='*.dylib' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin")}' include='*' overwrite='${true}'
-    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis -Properties TargetOS=Darwin' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/libuv.nuspec")}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/darwin")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin/contents/runtimes/osx/native")}' include='*.dylib' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin/contents")}' include='*' exclude='*.nuspec' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-darwin")}' include='Microsoft.AspNetCore.Internal.libuv-Darwin.nuspec' overwrite='${true}'
+    nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/Microsoft.AspNetCore.Internal.libuv-Darwin.nuspec")}'
 
 
 #ensure-clang

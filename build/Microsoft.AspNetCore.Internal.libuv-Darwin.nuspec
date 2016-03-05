@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
     <metadata>
-        <id>Microsoft.AspNetCore.Internal.libuv-$TargetOS$</id>
+        <id>Microsoft.AspNetCore.Internal.libuv-Darwin</id>
         <version>0.0.1-pre</version>
         <authors>Microsoft</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>libuv build package - $TargetOS$</description>
+        <description>libuv build package - Darwin</description>
     </metadata>
     <files>
-        <file src="**" />
+        <file src="contents/**" />
     </files>
 </package>
