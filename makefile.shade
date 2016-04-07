@@ -67,7 +67,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         var sources = string.Join(" ", sourceFiles);
 
         Exec(CLANG,
-            string.Format("{0} -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_DARWIN_USE_64_BIT_INODE=1 -D_DARWIN_UNLIMITED_SELECT=1 -arch i386 -arch x86_64",
+            string.Format("{0} -lm -pthread -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_DARWIN_USE_64_BIT_INODE=1 -D_DARWIN_UNLIMITED_SELECT=1 -D_BUILDING_UV_SHARED=1 -arch i386 -arch x86_64",
             sources, outputPath, libuvRoot));
     }
 
@@ -92,7 +92,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         var sources = string.Join(" ", sourceFiles);
 
         Exec(CLANG,
-            string.Format("{0} -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_GNU_SOURCE", sources, outputPath, libuvRoot));
+            string.Format("{0} -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, outputPath, libuvRoot));
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'

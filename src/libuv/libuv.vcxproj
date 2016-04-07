@@ -85,6 +85,7 @@
     <ClCompile Include="..\..\submodules\libuv\src\win\process-stdio.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\req.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\signal.c"/>
+    <ClCompile Include="..\..\submodules\libuv\src\win\snprintf.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\stream.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\tcp.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\tty.c"/>
