@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>Microsoft.AspNetCore.Internal.libuv-Darwin</id>
-        <version>0.0.1-pre</version>
+        <version>0.0.1-ignored</version>
         <authors>Microsoft</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>libuv build package - Darwin</description>
