@@ -6,6 +6,7 @@ k-standard-goals
 
 var Configuration2 = '${E("Configuration")}'
 var ROOT = '${Directory.GetCurrentDirectory()}'
+var TARGET_DIR_LOCAL='${Path.Combine(ROOT, "artifacts")}'
 var BUILD_DIR2 = '${Path.Combine(ROOT, "artifacts", "build")}'
 var PROGRAM_FILES_X86 = '${Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}'
 var MSBUILD = '${Path.Combine(PROGRAM_FILES_X86, "MSBuild", "14.0", "Bin", "MSBuild.exe")}'
@@ -19,6 +20,14 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 #native-compile
 
 #build-compile target='compile'
+    @{
+        Directory.CreateDirectory(TARGET_DIR_LOCAL);
+        if (AddAssemblyInfo)
+        {
+            var commitHashFile = Path.Combine(TARGET_DIR_LOCAL, "commit");
+            GitCommand("rev-parse HEAD >> " + commitHashFile);
+        }
+    }
 
 #build-windows .ensure-msbuild target='build-compile' if='CanBuildForWindows'
     @{
