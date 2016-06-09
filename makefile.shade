@@ -47,7 +47,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
     copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-arm\\native")}' include='*.dll' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents")}' include='*' exclude='*.nuspec' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='Microsoft.AspNetCore.Internal.libuv-Windows.nuspec' overwrite='${true}'
- 
+
     nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-win\\Microsoft.AspNetCore.Internal.libuv-Windows.nuspec")}'
 
 #build-darwin .ensure-clang target='build-compile' if='CanBuildForDarwin'
@@ -104,6 +104,8 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 #nuget-pack target='package' if='CanBuildForLinux'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/debian-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/rhel-x64/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/fedora-x64/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/opensuse-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents")}' include='*' exclude='*.nuspec' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux")}' include='Microsoft.AspNetCore.Internal.libuv-Linux.nuspec' overwrite='${true}'
     nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-linux/Microsoft.AspNetCore.Internal.libuv-Linux.nuspec")}'
@@ -140,7 +142,7 @@ functions @{
         get
         {
             return string.Equals(Uname(), "Linux");
-        } 
+        }
     }
 
     public string SearchForClang()
@@ -201,7 +203,7 @@ functions @{
 
     public List<string> GetCommonSourceFiles(string libuvRoot)
     {
-       return new List<string> 
+       return new List<string>
         {
             Path.Combine(libuvRoot, "src/fs-poll.c"),
             Path.Combine(libuvRoot, "src/inet.c"),
