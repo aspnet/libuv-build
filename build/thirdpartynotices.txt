@@ -7,7 +7,7 @@ Third Party IP to you under the licensing terms for the Microsoft product.
 Microsoft reserves all other rights not expressly granted under this agreement,
 whether by implication, estoppel or otherwise.
 
-libuv v. 1.7.3
+libuv v. 1.9.0
 
 Copyright Joyent, Inc. and other Node contributors. All rights reserved.
  Provided for Informational Purposes Only
