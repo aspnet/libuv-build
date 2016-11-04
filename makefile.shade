@@ -44,7 +44,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 #nuget-pack target='package' if='CanBuildForWindows'
     copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\Win32", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-x86\\native")}' include='*.dll' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\x64", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-x64\\native")}' include='*.dll' overwrite='${true}'
-    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win7-arm\\native")}' include='*.dll' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src\\libuv\\bin\\ARM", Configuration2)}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents\\runtimes\\win8-arm\\native")}' include='*.dll' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win\\contents")}' include='*' exclude='*.nuspec' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-win")}' include='Microsoft.AspNetCore.Internal.libuv-Windows.nuspec' overwrite='${true}'
 
