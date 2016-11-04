@@ -1,4 +1,4 @@
-var PRODUCT_VERSION = '1.9.0'
+var PRODUCT_VERSION = '1.10.0'
 var AUTHORS='Microsoft Open Technologies, Inc.'
 
 use-standard-lifecycle
@@ -59,6 +59,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/darwin-proctitle.c"));
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/kqueue.c"));
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/fsevents.c"));
+        sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/pthread-barrier.c"));
 
         var outputDir = Path.Combine(ROOT, "src/libuv/bin/darwin");
         var outputPath = Path.Combine(outputDir, "libuv.dylib");

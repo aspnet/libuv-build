@@ -24,11 +24,11 @@
     <ClCompile>
       <PreprocessorDefinitions Condition="'$(BuildForOneCore)' == 'True'">ONECORE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\submodules\libuv\include;..\..\submodules\libuv\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BUILDING_UV_SHARED=1;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0600;_GNU_SOURCE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILDING_UV_SHARED=1;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;_GNU_SOURCE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <Subsystem>Console</Subsystem>
-      <AdditionalDependencies>ws2_32.lib;userenv.lib;Psapi.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;userenv.lib;Psapi.lib;Iphlpapi.lib;advapi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -70,6 +70,7 @@
     <ClCompile Include="..\..\submodules\libuv\src\version.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\async.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\core.c"/>
+    <ClCompile Include="..\..\submodules\libuv\src\win\detect-wakeup.c" />
     <ClCompile Include="..\..\submodules\libuv\src\win\dl.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\error.c"/>
     <ClCompile Include="..\..\submodules\libuv\src\win\fs.c"/>
