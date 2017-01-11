@@ -96,6 +96,10 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         var armOutputPath = Path.Combine(armOutputDir, "libuv.so");
         Directory.CreateDirectory(armOutputDir);
 
+        var arm64OutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-arm64");
+        var arm64OutputPath = Path.Combine(arm64OutputDir, "libuv.so");
+        Directory.CreateDirectory(arm64OutputDir);
+
         var armelOutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-armel");
         var armelOutputPath = Path.Combine(armelOutputDir, "libuv.so");
         Directory.CreateDirectory(armelOutputDir);
@@ -104,10 +108,13 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
             string.Format("{0} -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, outputPath, libuvRoot));
 
         Exec(CLANG,
-            string.Format("{0} -target arm-linux-gnueabihf -B/usr/arm-linux-gnueabihf/bin/ -B/usr/arm-linux-gnueabihf/lib/ -isystem /usr/arm-linux-gnueabihf/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, armOutputPath, libuvRoot));
+            string.Format("{0} -target armv7a-linux-gnueabihf -B/usr/arm-linux-gnueabihf/bin/ -B/usr/arm-linux-gnueabihf/lib/ -isystem /usr/arm-linux-gnueabihf/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, armOutputPath, libuvRoot));
 
         Exec(CLANG,
-            string.Format("{0} -target arm-linux-gnueabi -B/usr/arm-linux-gnueabi/bin/ -B/usr/arm-linux-gnueabi/lib/ -isystem /usr/arm-linux-gnueabi/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, armelOutputPath, libuvRoot));
+            string.Format("{0} -target armv8a-linux-gnueabihf -B/usr/arm-linux-gnueabihf/bin/ -B/usr/arm-linux-gnueabihf/lib/ -isystem /usr/arm-linux-gnueabihf/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, arm64OutputPath, libuvRoot));
+
+        Exec(CLANG,
+            string.Format("{0} -target armv5-linux-gnueabi -B/usr/arm-linux-gnueabi/bin/ -B/usr/arm-linux-gnueabi/lib/ -isystem /usr/arm-linux-gnueabi/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, armelOutputPath, libuvRoot));
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'
@@ -118,6 +125,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 
 #nuget-pack target='package' if='CanBuildForLinux'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm64")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-armel")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-armel/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/debian-x64/native")}' include='*.so' overwrite='${true}'
