@@ -86,14 +86,28 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-inotify.c"));
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-syscalls.c"));
 
+        var sources = string.Join(" ", sourceFiles);
+
         var outputDir = Path.Combine(ROOT, "src/libuv/bin/linux");
         var outputPath = Path.Combine(outputDir, "libuv.so");
         Directory.CreateDirectory(outputDir);
 
-        var sources = string.Join(" ", sourceFiles);
+        var armOutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-arm");
+        var armOutputPath = Path.Combine(armOutputDir, "libuv.so");
+        Directory.CreateDirectory(armOutputDir);
+
+        var armelOutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-armel");
+        var armelOutputPath = Path.Combine(armelOutputDir, "libuv.so");
+        Directory.CreateDirectory(armelOutputDir);
 
         Exec(CLANG,
             string.Format("{0} -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, outputPath, libuvRoot));
+
+        Exec(CLANG,
+            string.Format("{0} -target arm-linux-gnueabihf -B/usr/arm-linux-gnueabihf/bin/ -B/usr/arm-linux-gnueabihf/lib/ -isystem /usr/arm-linux-gnueabihf/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, armOutputPath, libuvRoot));
+
+        Exec(CLANG,
+            string.Format("{0} -target arm-linux-gnueabi -B/usr/arm-linux-gnueabi/bin/ -B/usr/arm-linux-gnueabi/lib/ -isystem /usr/arm-linux-gnueabi/include -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, armelOutputPath, libuvRoot));
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'
@@ -103,6 +117,8 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
     nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/Microsoft.AspNetCore.Internal.libuv-Darwin.nuspec")}'
 
 #nuget-pack target='package' if='CanBuildForLinux'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-armel")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-armel/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/debian-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/rhel-x64/native")}' include='*.so' overwrite='${true}'
