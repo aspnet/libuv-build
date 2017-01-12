@@ -86,14 +86,43 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-inotify.c"));
         sourceFiles.Add(Path.Combine(libuvRoot, "src/unix/linux-syscalls.c"));
 
+        var sources = string.Join(" ", sourceFiles);
+
         var outputDir = Path.Combine(ROOT, "src/libuv/bin/linux");
         var outputPath = Path.Combine(outputDir, "libuv.so");
         Directory.CreateDirectory(outputDir);
 
-        var sources = string.Join(" ", sourceFiles);
+        var armOutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-arm");
+        var armOutputPath = Path.Combine(armOutputDir, "libuv.so");
+        Directory.CreateDirectory(armOutputDir);
+
+        var arm64OutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-arm64");
+        var arm64OutputPath = Path.Combine(arm64OutputDir, "libuv.so");
+        Directory.CreateDirectory(arm64OutputDir);
+
+        var armelOutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-armel");
+        var armelOutputPath = Path.Combine(armelOutputDir, "libuv.so");
+        Directory.CreateDirectory(armelOutputDir);
+
+        var flags = string.Format("-lm -pthread -ldl -lrt -fPIC -shared -I{0}/include -I{0}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", libuvRoot);
 
         Exec(CLANG,
-            string.Format("{0} -lm -pthread -ldl -lrt -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", sources, outputPath, libuvRoot));
+            string.Format("{0} -o {1} {2}", sources, outputPath, flags));
+
+        // The "arm" target should align with what CoreFX is doing, see
+        // https://github.com/dotnet/corefx/blob/master/cross/arm/toolchain.cmake#L9
+        Exec(CLANG,
+            string.Format("{0} -target armv7-linux-gnueabihf -mfpu=vfpv3 -B/usr/arm-linux-gnueabihf/bin/ -B/usr/arm-linux-gnueabihf/lib/ -isystem /usr/arm-linux-gnueabihf/include -o {1} {2}", sources, armOutputPath, flags));
+
+        // The "arm64" target should align with what CoreFX is doing, see
+        // https://github.com/dotnet/corefx/blob/master/cross/arm64/toolchain.cmake
+        Exec(CLANG,
+            string.Format("{0} -target aarch64-linux-gnu -B/usr/aarch64-linux-gnu/bin/ -B/usr/aarch64-linux-gnu/lib/ -isystem /usr/aarch64-linux-gnu/include -o {1} {2}", sources, arm64OutputPath, flags));
+
+        // The "armel" target should align with what CoreFX is doing, see
+        // https://github.com/dotnet/corefx/blob/master/cross/armel/toolchain.cmake#L9
+        Exec(CLANG,
+            string.Format("{0} -target armv7-linux-gnueabi -mfpu=vfpv3 -mfloat-abi=softfp -B/usr/arm-linux-gnueabi/bin/ -B/usr/arm-linux-gnueabi/lib/ -isystem /usr/arm-linux-gnueabi/include -o {1} {2}", sources, armelOutputPath, flags));
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'
@@ -103,6 +132,9 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
     nuget-pack packageVersion='${FULL_VERSION}' outputDir='${BUILD_DIR2}' extra='-NoPackageAnalysis' nugetPath='.build/nuget.exe' nuspecFile='${Path.Combine(BUILD_DIR2, "package-src-darwin/Microsoft.AspNetCore.Internal.libuv-Darwin.nuspec")}'
 
 #nuget-pack target='package' if='CanBuildForLinux'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm64")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm64/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-armel")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-armel/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/debian-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/rhel-x64/native")}' include='*.so' overwrite='${true}'
