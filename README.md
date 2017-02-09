@@ -10,7 +10,7 @@ How the libuv package is built
 
 Packages for different operating systems and architectures are built from this repo, which pulls libuv code as a submodule, and pushed to the [aspnetcore-ci-dev MyGet feed](https://dotnet.myget.org/gallery/aspnetcore-ci-dev) as OS specific `Microsoft.AspNetCore.Internal.libuv-*` packages.
 
-The [libuv-package](https://github.com/libuv-package) repo is responsible for pulling the build packages and creating the consolidated [libuv](https://www.nuget.org/packages/Libuv/) package that contains bits for all supported architectures.
+The [libuv-package](https://github.com/aspnet/libuv-package) repo is responsible for pulling the build packages and creating the consolidated [libuv](https://www.nuget.org/packages/Libuv/) package that contains bits for all supported architectures.
 
 Build instructions
 ----------
