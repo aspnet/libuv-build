@@ -13,6 +13,27 @@ var CLANG = '${SearchForClang()}'
 
 var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 
+#unset-env
+  - Environment.SetEnvironmentVariable("KOREBUILD_ADD_ASSEMBLY_INFO", "0");
+
+#copy-libuv
+  exec program='dotnet' commandline='restore tools/LibuvCopier/ packaging/Libuv'
+  exec program='dotnet' commandline='run -p ../../tools/LibuvCopier' workingdir='${Path.Combine(Directory.GetCurrentDirectory(), "packaging/Libuv")}'
+
+#create-commit-file
+  @{
+    if (!IsLinux)
+    {
+        var artifactsDir = Path.Combine(Directory.GetCurrentDirectory(), "artifacts");
+        var commitHashFile = Path.Combine(artifactsDir, "commit");
+        Directory.CreateDirectory(artifactsDir);
+        GitCommand("rev-parse HEAD >> " + commitHashFile);
+    }
+  }
+
+#package-libuv .unset-env .copy-libuv .create-commit-file
+  exec program='dotnet' commandline='pack packaging/Libuv/ --output ${BUILD_DIR2} ${E("KOREBUILD_DOTNET_PACK_OPTIONS")} --no-build'
+
 #repo-initialize target='initialize'
     git gitCommand="submodule update --init"
 
