@@ -1,0 +1,52 @@
+{
+  "version": "1.10.0-*",
+  "description": "Multi-platform support library with a focus on asynchronous I/O.",
+  "licenseUrl": "https://raw.githubusercontent.com/aspnet/libuv-build/775a18ca77368a0f4ca753e82b2369f24707fb3e/build/License.txt",
+  "authors": [
+    "Libuv"
+  ],
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "http://github.com/aspnet/libuv-build"
+    },
+    "tags": [
+      "libuv"
+    ],
+    "files": {
+      "mappings": {
+        "/": "License.txt",
+        "runtimes/win7-x64/native/": "runtimes/win7-x64/native/*",
+        "runtimes/win7-x86/native/": "runtimes/win7-x86/native/*",
+        "runtimes/win8-arm/native/": "runtimes/win8-arm/native/*",
+        "runtimes/osx/native/": "runtimes/osx/native/*",
+        "runtimes/linux-x64/native/": "runtimes/linux-x64/native/*",
+        "runtimes/rhel-x64/native/": "runtimes/rhel-x64/native/*",
+        "runtimes/debian-x64/native/": "runtimes/debian-x64/native/*",
+        "runtimes/opensuse-x64/native/": "runtimes/opensuse-x64/native/*",
+        "runtimes/fedora-x64/native/": "runtimes/fedora-x64/native/*",
+        "runtimes/linux-arm/native/": "runtimes/linux-arm/native/*",
+        "runtimes/linux-arm64/native/": "runtimes/linux-arm64/native/*",
+        "runtimes/linux-armel/native/": "runtimes/linux-armel/native/*"
+      }
+    }
+  },
+  "dependencies": {
+    "Microsoft.NETCore.Platforms": "1.0.1",
+    "Microsoft.AspNetCore.Internal.libuv-Darwin": {
+      "version": "1.10.0-*",
+      "type": "build"
+    },
+    "Microsoft.AspNetCore.Internal.libuv-Linux": {
+      "version": "1.10.0-*",
+      "type": "build"
+    },
+    "Microsoft.AspNetCore.Internal.libuv-Windows": {
+      "version": "1.10.0-*",
+      "type": "build"
+    }
+  },
+  "frameworks": {
+    "netstandard1.0": {}
+  }
+}
