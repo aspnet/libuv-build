@@ -25,9 +25,11 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions);$(Defines)</PreprocessorDefinitions>
       <TreatWarningAsError Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningAsError>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <DynamicBase>true</DynamicBase>
     </Link>
   </ItemDefinitionGroup>
 
