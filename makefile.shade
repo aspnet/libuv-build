@@ -67,9 +67,11 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 
         var sources = string.Join(" ", sourceFiles);
 
+        var optimization = string.Equals("Release", Configuration2, StringComparison.OrdinalIgnoreCase) ? " -O3 ": "";
+
         Exec(CLANG,
-            string.Format("{0} -lm -pthread -fPIC -shared -o {1}  -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_DARWIN_USE_64_BIT_INODE=1 -D_DARWIN_UNLIMITED_SELECT=1 -D_BUILDING_UV_SHARED=1 -arch i386 -arch x86_64",
-            sources, outputPath, libuvRoot));
+            string.Format("{0} -lm -pthread -fPIC -fsanitize=address {3} -shared -o {1} -I{2}/include -I{2}/src -Wall -Wextra -Wno-unused-parameter -g --std=gnu89 -pedantic -D_DARWIN_USE_64_BIT_INODE=1 -D_DARWIN_UNLIMITED_SELECT=1 -D_BUILDING_UV_SHARED=1 -arch i386 -arch x86_64",
+            sources, outputPath, libuvRoot, optimization));
     }
 
 #nuget-pack target='package' if='CanBuildForDarwin'
@@ -104,7 +106,9 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         var armelOutputPath = Path.Combine(armelOutputDir, "libuv.so");
         Directory.CreateDirectory(armelOutputDir);
 
-        var flags = string.Format("-lm -pthread -ldl -lrt -fPIC -shared -I{0}/include -I{0}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", libuvRoot);
+        var optimization = string.Equals("Release", Configuration2, StringComparison.OrdinalIgnoreCase) ? " -O3 ": "";
+
+        var flags = string.Format("-lm -pthread -ldl -lrt -fPIC -fsanitize=address {1} -shared -I{0}/include -I{0}/src -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -g --std=gnu89 -pedantic -D_GNU_SOURCE -D_BUILDING_UV_SHARED=1", libuvRoot, optimization);
 
         Exec(CLANG,
             string.Format("{0} -o {1} {2}", sources, outputPath, flags));
