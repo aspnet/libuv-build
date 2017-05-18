@@ -25,10 +25,8 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions);$(Defines)</PreprocessorDefinitions>
       <TreatWarningAsError Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningAsError>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <DynamicBase>true</DynamicBase>
     </Link>
   </ItemDefinitionGroup>
@@ -37,6 +35,7 @@
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </ClCompile>
   </ItemDefinitionGroup>
 
@@ -46,10 +45,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </Link>
   </ItemDefinitionGroup>
 
