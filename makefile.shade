@@ -1,4 +1,4 @@
-var PRODUCT_VERSION = '1.9.0'
+var PRODUCT_VERSION = '1.9.2'
 var AUTHORS='Microsoft Open Technologies, Inc.'
 
 use-standard-lifecycle
