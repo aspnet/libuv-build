@@ -13,7 +13,7 @@ buildFile="$buildFolder/KoreBuild.sh"
 if test ! -d $buildFolder; then
     echo "Downloading KoreBuild from $koreBuildZip"
 
-    tempFolder="/tmp/KoreBuild-$(uuidgen)"
+    tempFolder="/tmp/KoreBuild-$(./uuid.sh)"
     mkdir $tempFolder
 
     localZipFile="$tempFolder/korebuild.zip"
