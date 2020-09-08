@@ -100,6 +100,10 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         var arm64OutputPath = Path.Combine(arm64OutputDir, "libuv.so");
         Directory.CreateDirectory(arm64OutputDir);
 
+        var mips64OutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-mips64");
+        var mips64OutputPath = Path.Combine(mips64OutputDir, "libuv.so");
+        Directory.CreateDirectory(mips64OutputDir);
+
         var armelOutputDir = Path.Combine(ROOT, "src/libuv/bin/linux-armel");
         var armelOutputPath = Path.Combine(armelOutputDir, "libuv.so");
         Directory.CreateDirectory(armelOutputDir);
@@ -119,6 +123,11 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
         Exec(CLANG,
             string.Format("{0} -target aarch64-linux-gnu -B/usr/aarch64-linux-gnu/bin/ -B/usr/aarch64-linux-gnu/lib/ -isystem /usr/aarch64-linux-gnu/include -o {1} {2}", sources, arm64OutputPath, flags));
 
+        // The "mips64" target
+        Exec(CLANG,
+            string.Format("{0} -target mips64el-linux-gnuabi64 -B/usr/mips64el-linux-gnuabi64/bin/ -B/usr/mips64el-linux-gnuabi64/lib/ -isystem /usr/mips64el-linux-gnuabi64/include -o {1} {2}", sources, mips64OutputPath, flags));
+
+
         // The "armel" target should align with what CoreFX is doing, see
         // https://github.com/dotnet/corefx/blob/master/cross/armel/toolchain.cmake#L9
         Exec(CLANG,
@@ -134,6 +143,7 @@ var FULL_VERSION = '${PRODUCT_VERSION + "-" + E("DOTNET_BUILD_VERSION")}'
 #nuget-pack target='package' if='CanBuildForLinux'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-arm64")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-arm64/native")}' include='*.so' overwrite='${true}'
+    copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-mips64")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-mips64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux-armel")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-armel/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "src/libuv/bin/linux")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents/runtimes/linux-x64/native")}' include='*.so' overwrite='${true}'
     copy sourceDir='${Path.Combine(ROOT, "build")}' outputDir='${Path.Combine(BUILD_DIR2, "package-src-linux/contents")}' include='*' exclude='*.nuspec' overwrite='${true}'
